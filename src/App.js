@@ -2,25 +2,26 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { TodoForm, TodoList } from './components/todo'
-import { addTodo, generateId } from './lib/todoHelpers'
+import { addTodo, generateId, findById, toggleTodo, updateTodo } from './lib/todoHelpers'
 
 class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      todos: [
-        { id: 1, name: 'Learn JSX', isComplete: true },
-        { id: 2, name: 'Build an Awesome App', isComplete: false },
-        { id: 3, name: 'Ship It', isComplete: false }
-      ],
-      currentTodo: ''
-    }
-    this.handleInputChange = this.handleInputChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
-    this.handleEmptySubmit = this.handleEmptySubmit.bind(this)
+  state = {
+    todos: [
+      { id: 1, name: 'Learn JSX', isComplete: true },
+      { id: 2, name: 'Build an Awesome App', isComplete: false },
+      { id: 3, name: 'Ship It', isComplete: false }
+    ],
+    currentTodo: ''
   }
 
-  handleSubmit(event) {
+  handleToggle = (id) => {
+    const todo = findById(id, this.state.todos)
+    const toggled = toggleTodo(todo)
+    const updatedTodos = updateTodo(this.state.todos, toggled)
+    this.setState({ todos: updatedTodos })
+  }
+
+  handleSubmit = (event) => {
     event.preventDefault()
     const newId = generateId()
     const newTodo = { id: newId, name: this.state.currentTodo, isComplete: false }
@@ -32,15 +33,15 @@ class App extends Component {
     })
   }
 
-  handleEmptySubmit(event) {
+  handleEmptySubmit = (event) => {
     event.preventDefault()
     this.setState({
       errorMessage: 'Please supply a todo name'
     })
   }
 
-  handleInputChange (event) {
-    this.setState({
+  handleInputChange = (event) => {
+      this.setState({
       currentTodo: event.target.value
     })
   }
@@ -60,7 +61,7 @@ class App extends Component {
             handleSubmit={ submitHandler }
             currentTodo={ this.state.currentTodo }
           />
-          <TodoList todos={ this.state.todos } />
+          <TodoList handleToggle={ this.handleToggle } todos={ this.state.todos } />
         </div>
       </div>
     );
